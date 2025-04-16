@@ -10,21 +10,48 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-model Post {
-  id        String     @default(cuid()) @id
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
-}
-
 model User {
   id            String       @default(cuid()) @id
   name          String?
   email         String?   @unique
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  posts         Post[]
-  @@map(name: "users")
+}
+
+model Anime {
+  id          String     @default(cuid()) @id
+  name        String     @unique
+  genres      Genre[]
+  status      AnimeStatus
+  type        AnimeType
+  image       String?
+  coverImage  String?
+  rating      Float?     @default(0)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+}
+
+model Genre {
+  id          String     @default(cuid()) @id
+  name        String     @unique
+  animes      Anime[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@map("genres")
+}
+
+enum AnimeStatus {
+  ONGOING
+  COMPLETED
+  UPCOMING
+  HIATUS
+}
+
+enum AnimeType {
+  TV
+  MOVIE
+  OVA
+  ONA
+  SPECIAL
 }
